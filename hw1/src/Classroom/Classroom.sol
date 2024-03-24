@@ -4,9 +4,15 @@ pragma solidity ^0.8.0;
 /* Problem 1 Interface & Contract */
 contract StudentV1 {
     // Note: You can declare some state variable
-
+    mapping(address => uint256) private _code;
+    
     function register() external returns (uint256) {
         // TODO: please add your implementaiton here
+        if(_code[msg.sender]==0){
+            _code[msg.sender]=123;
+            return 1000;
+        }
+        else return _code[msg.sender];
     }
 }
 
@@ -18,6 +24,8 @@ interface IClassroomV2 {
 contract StudentV2 {
     function register() external view returns (uint256) {
         // TODO: please add your implementaiton here
+        if(IClassroomV2(msg.sender).isEnrolled()) return 123;
+        else return 1000;
     }
 }
 
@@ -25,5 +33,7 @@ contract StudentV2 {
 contract StudentV3 {
     function register() external view returns (uint256) {
         // TODO: please add your implementaiton here
+        if(gasleft()>=6660) return 1000;
+        else return 123;
     }
 }

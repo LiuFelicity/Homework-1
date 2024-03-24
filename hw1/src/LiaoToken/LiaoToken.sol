@@ -17,7 +17,7 @@ contract LiaoToken is IERC20 {
     // TODO: you might need to declare several state variable here
     mapping(address account => uint256) private _balances;
     mapping(address account => bool) isClaim;
-
+    mapping (address => mapping (address => uint256)) private allowances;
     uint256 private _totalSupply;
 
     string private _name;
@@ -60,17 +60,44 @@ contract LiaoToken is IERC20 {
 
     function transfer(address to, uint256 amount) external returns (bool) {
         // TODO: please add your implementaiton here
+        _balances[msg.sender] -= amount;
+        _balances[to] += amount;
+        emit Transfer(msg.sender, to, amount);
+        return true;
     }
 
     function transferFrom(address from, address to, uint256 value) external returns (bool) {
         // TODO: please add your implementaiton here
+        //if(!approve(msg.sender, value)) return false;
+        //if(allowances[from][msg.sender]<value) return false;
+        //require(allowances[from][msg.sender]>0, "not allow");
+        uint256 _allowance = allowances[from][msg.sender];
+        //if(_allowance < value) return false;
+        uint256 leftAllowance = _allowance - value;
+        //require(leftAllowance >= 0, "Not enought allowance!");
+        if(leftAllowance < 0) {
+            revert();
+            //return true;
+        }
+        allowances[from][msg.sender] = leftAllowance;
+        //require(_balances[from] > value, "Not enought allowance!");
+        if (_balances[from] < value)  revert();
+        _balances[from] -= value;
+        _balances[to] += value;
+        emit Transfer(from, to, value);
+        return true;
+        
     }
 
     function approve(address spender, uint256 amount) external returns (bool) {
         // TODO: please add your implementaiton here
+        allowances[msg.sender][spender] = amount;
+        emit Approval(msg.sender, spender, amount);
+        return true;
     }
 
     function allowance(address owner, address spender) public view returns (uint256) {
         // TODO: please add your implementaiton here
+        return allowances[owner][spender];
     }
 }
